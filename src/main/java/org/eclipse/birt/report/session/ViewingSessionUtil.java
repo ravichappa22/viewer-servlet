@@ -18,6 +18,8 @@ import org.eclipse.birt.report.IBirtConstants;
 import org.eclipse.birt.report.exception.ViewerException;
 import org.eclipse.birt.report.utility.ParameterAccessor;
 
+import java.util.logging.Logger;
+
 /**
  * Utility class to easily access ViewingSessionManager from HTTP requests.
  */
@@ -101,7 +103,7 @@ public class ViewingSessionUtil
 				session = manager.getSession( getSessionId( request ) );
 				// save the object in a request attribute
 				request.setAttribute( ParameterAccessor.ATTR_VIEWING_SESSION,
-							session );
+							session);
 			}
 		}
 		return session;
@@ -125,9 +127,11 @@ public class ViewingSessionUtil
 		IViewingSessionManager manager = getSessionManager( request, true );
 		IViewingSession session = manager.createSession();
 		//for redis serialization no harm for normal session also
-		request.getSession().setAttribute(
-				IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
-				manager);
+		if(request.getSession() != null) {
+			request.getSession().setAttribute(
+					IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
+					manager);
+		}
 			// save the object in a request attribute
 		request.setAttribute( ParameterAccessor.ATTR_VIEWING_SESSION,
 						session );
