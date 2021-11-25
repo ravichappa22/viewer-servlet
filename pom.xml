@@ -55,24 +55,28 @@
       <groupId>org.eclipse.birt.runtime</groupId>
       <artifactId>org.eclipse.birt.runtime</artifactId>
       <version>4.8.0-20180522</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.innoventsolutions.birt.runtime/com.ibm.icu_58.2.0.v20170418-1837 -->
     <dependency>
       <groupId>com.innoventsolutions.birt.runtime</groupId>
       <artifactId>com.ibm.icu_58.2.0.v20170418-1837</artifactId>
       <version>4.8.0</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/javax.xml/jaxrpc -->
     <dependency>
       <groupId>javax.xml</groupId>
       <artifactId>jaxrpc</artifactId>
       <version>1.1</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.innoventsolutions.birt.runtime/org.mozilla.javascript_1.7.5.v201504281450 -->
     <dependency>
       <groupId>com.innoventsolutions.birt.runtime</groupId>
       <artifactId>org.mozilla.javascript_1.7.5.v201504281450</artifactId>
       <version>4.8.0</version>
+      <scope>provided</scope>
     </dependency>
 
 
