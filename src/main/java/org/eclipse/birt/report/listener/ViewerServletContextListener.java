@@ -53,9 +53,10 @@ public class ViewerServletContextListener implements ServletContextListener
 	 */
 	public void contextInitialized( ServletContextEvent event )
 	{
+		System.out.print("ViewerServletContextListener called event = " + event.getSource());
 		ParameterAccessor.initParameters( event.getServletContext( ) );
-		IViewerReportService instance = new BirtViewerReportService( event
-				.getServletContext( ) );
+		IViewerReportService instance = new BirtViewerReportService(event
+				.getServletContext());
 		BirtReportServiceFactory.init( instance );
 		try
 		{

@@ -12,10 +12,7 @@
 package org.eclipse.birt.report.session;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
@@ -49,6 +46,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	
 	private ViewingCache viewingCache;
 	private long nextCleanupTime;
+	private boolean newlyCreated;
 
 	/**
 	 * Linked hash map containing the ViewingSession objects in access order.
@@ -140,6 +138,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 
 		public void lock( )
 		{
+			System.out.println("wrapper called for lock");
 			session.lock( );
 		}
 
@@ -181,6 +180,8 @@ public class ViewingSessionManager implements IViewingSessionManager,
 		this.expired = false;
 		this.nextCleanupTime = new Date( ).getTime( )
 				+ config.getSessionTimeout( ) * 1000l;
+		this.newlyCreated = true;
+		System.out.println("nextCleanupTime in ViewingSessionManager = " + this.nextCleanupTime);
 	}
 
 	/**
@@ -202,12 +203,21 @@ public class ViewingSessionManager implements IViewingSessionManager,
 		return httpSessionId;
 	}
 
+	public boolean isNewlyCreated() {
+		return newlyCreated;
+	}
+
+	public void setNewlyCreated(boolean newlyCreated) {
+		this.newlyCreated = newlyCreated;
+	}
+
 	/**
 	 * @see
 	 * IViewingSessionManager#createSession()
 	 */
 	public synchronized IViewingSession createSession( ) throws ViewerException
 	{
+		System.out.println("viewing sesion manger createSession called = " + sessions.size());
 		checkExpired( );
 		cleanUp( );
 
@@ -231,9 +241,10 @@ public class ViewingSessionManager implements IViewingSessionManager,
 					break;
 			}
 		}
+		System.out.println("newSession getting created for = " + httpSessionId);
 		IViewingSession newSession = new ViewingSessionWrapper( this,
 				new ViewingSession( httpSessionId, viewingCache ) );
-		sessions.put( newSession.getId( ), newSession );
+		sessions.put(newSession.getId(), newSession );
 		return newSession;
 	}
 
@@ -244,12 +255,14 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	public synchronized IViewingSession getSession( String id )
 	{
+		System.out.println("getSession id called " + id);
 		checkExpired( );
 
 		ViewingSessionWrapper session = (ViewingSessionWrapper) sessions
 				.get( id );
 		if ( session != null )
 		{
+			System.out.print("refreshing session");
 			session.getWrappedSession( ).refresh( );
 		}
 		return session;
@@ -260,6 +273,9 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	public synchronized void invalidate( )
 	{
+		System.out.println("invalidate called on viewing session Manager stack trace is " );
+		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(ste -> System.out.println("class = " + ste.getClassName() + " method name = "
+				+ ste.getMethodName() + "line number = " + ste.getLineNumber()));
 		if ( expired )
 		{
 			return;
@@ -324,9 +340,12 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	private synchronized void cleanUp( )
 	{
+		System.out.println("nextCleanupTime before = " + nextCleanupTime);
 		long now = new Date( ).getTime( );
+		System.out.println("now  = " + now);
 		if ( now >= nextCleanupTime || sessions.size( ) > sessionCountThreshold )
 		{
+			System.out.println("doCleanup gettin called");
 			doCleanup( );
 			if ( sessions.size( ) > 0 )
 			{
@@ -335,6 +354,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 						.next( );
 				nextCleanupTime = oldestSession.getLastAccess( ).getTime( )
 						+ config.getSessionTimeout( ) * 1000l;
+				System.out.println("nextCleanupTime after = " + nextCleanupTime);
 			}
 			else
 			{
@@ -361,26 +381,29 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	private synchronized void doCleanup( )
 	{
-		if ( sessions.size( ) == 0 )
+		System.out.println("sessions.size( ) = " + sessions.size());
+		if ( sessions.size() == 0 )
 		{
 			return;
 		}
-		long sessionTimeout = config.getSessionTimeout( ) * 1000l;
-		long currentTime = new Date( ).getTime( ) - sessionTimeout;
+		long sessionTimeout = config.getSessionTimeout() * 1000l;
+		long currentTime = new Date().getTime() - sessionTimeout;
 		for ( Iterator<Map.Entry<String, IViewingSession>> i = sessions
-				.entrySet( ).iterator( ); i.hasNext( ); )
+				.entrySet().iterator(); i.hasNext(); )
 		{
 			Map.Entry<String, IViewingSession> entry = i.next( );
 			IViewingSession session = entry.getValue( );
 			Date lastAccess = session.getLastAccess( );
-			if ( currentTime >= lastAccess.getTime( ) && !session.isLocked( ) )
+			if ( currentTime >= lastAccess.getTime() && !session.isLocked())
 			{
-				if ( !session.isExpired( ) )
+				System.out.println("currentTime = " + currentTime);
+				if (!session.isExpired())
 				{
-					( (ViewingSessionWrapper) session ).getWrappedSession( )
-							.invalidate( );
+					System.out.println("trying to invalidate due to session ");
+					( (ViewingSessionWrapper) session ).getWrappedSession()
+							.invalidate();
 				}
-				i.remove( );
+				i.remove();
 			}
 			else
 			{
@@ -421,6 +444,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	private void checkExpired( )
 	{
+		System.out.println("checkExpired = " + expired);
 		if ( expired )
 		{
 			throw new IllegalStateException(
@@ -434,6 +458,9 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	public void valueBound( HttpSessionBindingEvent event )
 	{
+		System.out.println("value bound method called on viewingsessionmanager " + event.getSession().getId());
+
+
 	}
 
 	/**
@@ -441,6 +468,10 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	 */
 	public void valueUnbound( HttpSessionBindingEvent event )
 	{
+		System.out.println("viewingsessionManager valueUnbound called session id = " + event.getSession().getId() + " and the expired is = " + expired
+							+ "trace is = ");
+		Arrays.stream(Thread.currentThread().getStackTrace()).forEach(ste -> System.out.println("class = " + ste.getClassName() + " method name = "
+															+ ste.getMethodName() + "line number = " + ste.getLineNumber()));
 		synchronized (this)
 		{
 			if ( !expired )

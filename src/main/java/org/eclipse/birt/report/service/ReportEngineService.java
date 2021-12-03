@@ -908,16 +908,21 @@ public class ReportEngineService
 		IRunAndRenderTask runAndRenderTask = null;
 		try
 		{
-			runAndRenderTask = createRunAndRenderTask( runnable,
-					outputStream,
-					inputOptions,
-					parameters,
-					embeddable,
-					activeIds,
-					aRenderOption,
-					displayTexts,
-					reportTitle,
-					maxRows );
+			try {
+				runAndRenderTask = createRunAndRenderTask( runnable,
+						outputStream,
+						inputOptions,
+						parameters,
+						embeddable,
+						activeIds,
+						aRenderOption,
+						displayTexts,
+						reportTitle,
+						maxRows );
+			} catch (ViewerException e) {
+				e.printStackTrace();
+				throwDummyException( e );
+			}
 		}
 		catch ( ReportServiceException e )
 		{
@@ -959,8 +964,7 @@ public class ReportEngineService
 			OutputStream outputStream, InputOptions inputOptions,
 			Map parameters, Boolean embeddable, List activeIds,
 			RenderOption aRenderOption, Map displayTexts, String reportTitle,
-			Integer maxRows ) throws ReportServiceException
-	{
+			Integer maxRows ) throws ReportServiceException, ViewerException {
 		RenderOption renderOption = aRenderOption;
 
 		HttpServletRequest request = (HttpServletRequest) inputOptions.getOption( InputOptions.OPT_REQUEST );
@@ -1521,11 +1525,16 @@ public class ReportEngineService
 		IRenderTask renderTask = null;
 		try
 		{
-			renderTask = createRenderTask( out,
-					reportDocument,
-					inputOptions,
-					pageNumber,
-					activeIds );
+			try {
+				renderTask = createRenderTask( out,
+						reportDocument,
+						inputOptions,
+						pageNumber,
+						activeIds );
+			} catch (ViewerException e) {
+				e.printStackTrace();
+				throwDummyException( e );
+			}
 		}
 		catch ( ReportServiceException e )
 		{
@@ -1591,8 +1600,7 @@ public class ReportEngineService
 	 */
 	private IRenderTask createRenderTask( OutputStream out,
 			IReportDocument reportDocument, InputOptions inputOptions,
-			long pageNumber, List activeIds ) throws ReportServiceException
-	{
+			long pageNumber, List activeIds ) throws ReportServiceException, ViewerException {
 		HttpServletRequest request = (HttpServletRequest) inputOptions.getOption( InputOptions.OPT_REQUEST );
 		Locale locale = (Locale) inputOptions.getOption( InputOptions.OPT_LOCALE );
 		TimeZone timeZone = (TimeZone) inputOptions.getOption( InputOptions.OPT_TIMEZONE );
@@ -1917,11 +1925,16 @@ public class ReportEngineService
 		IRenderTask renderTask = null;
 		try
 		{
-			renderTask = createRenderTask( out,
-					reportDocument,
-					inputOptions,
-					-1,
-					activeIds );
+			try {
+				renderTask = createRenderTask( out,
+						reportDocument,
+						inputOptions,
+						-1,
+						activeIds );
+			} catch (ViewerException e) {
+				e.printStackTrace();
+				throwDummyException( e );
+			}
 		}
 		catch ( ReportServiceException e )
 		{

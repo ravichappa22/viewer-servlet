@@ -100,6 +100,7 @@ public class ViewingSession implements IViewingSession, Serializable
 	 */
 	private void checkExpired( )
 	{
+		System.out.println("checking expired in viewingSession = " + expired);
 		if ( expired )
 		{
 			throw new IllegalStateException(

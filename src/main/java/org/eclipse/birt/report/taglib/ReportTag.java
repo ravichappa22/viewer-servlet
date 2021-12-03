@@ -152,7 +152,7 @@ public class ReportTag extends AbstractViewerTag
 		
 		HttpServletRequest request = (HttpServletRequest) pageContext
 				.getRequest( );
-
+		System.out.println("reques is at ReportTag = " + request.getSession().getId());
 		IViewingSession session = ViewingSessionUtil.createSession( request );
 		session.lock();
 		try

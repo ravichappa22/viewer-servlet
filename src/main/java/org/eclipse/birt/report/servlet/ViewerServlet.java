@@ -176,7 +176,7 @@ public class ViewerServlet extends BirtSoapMessageDispatcherServlet
 		{
 			activeFragment = run;
 		}
-
+		System.out.println("servletPath = " +servletPath + " activeFragment = " + activeFragment);
 		if ( activeFragment != null )
 			activeFragment.service( context.getRequest( ), context
 					.getResponse( ) );

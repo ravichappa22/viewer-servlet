@@ -144,6 +144,7 @@ abstract public class BirtSoapMessageDispatcherServlet extends AxisServlet
 		try
 		{
 			// create new session
+			System.out.println("trying to call createSession from doGet");
 			IViewingSession session = ViewingSessionUtil.createSession( request );
 			session.lock();
 			try
@@ -225,12 +226,14 @@ abstract public class BirtSoapMessageDispatcherServlet extends AxisServlet
 		IContext context = null;
 		try
 		{
-			session = ViewingSessionUtil.getSession( request );
+			System.out.println("isSoapRequest = " + isSoapRequest);
+			session = ViewingSessionUtil.getSession(request);
 			if ( session == null && !isSoapRequest )
 			{
 				if ( ViewingSessionUtil.getSessionId(request) == null )
 				{
 					session = ViewingSessionUtil.createSession( request );
+					System.out.println("created new session");
 				}
 				else
 				{

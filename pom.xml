@@ -4,13 +4,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.eclipse.birt.example</groupId>
-  <artifactId>viewer-servlet</artifactId>
-  <version>4.2.1-005</version>
+  <groupId>org.eclipse.birt.report</groupId>
+  <artifactId>viewservlets</artifactId>
+  <version>4.4.2-Fiserv</version>
 
-  <name>viewer-servlet</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <name>viewservlets</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -42,13 +42,13 @@ public class ViewingSessionUtil
 	 *         session
 	 */
 	public static IViewingSessionManager getSessionManager(
-			HttpServletRequest request, boolean create )
-	{
+			HttpServletRequest request, boolean create ) throws ViewerException {
 		HttpSession httpSession = request.getSession( create );
 		if ( httpSession != null )
 		{
 			IViewingSessionManager sessionManager = (IViewingSessionManager) httpSession
 					.getAttribute( IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER );
+			System.out.println("attribute sessionManager = " + sessionManager + " create = " + true);
 			if ( sessionManager == null && create )
 			{
 				long aSessionTimeout = defaultConfig.getSessionTimeout( );
@@ -64,13 +64,17 @@ public class ViewingSessionUtil
 					}					
 					defaultConfig.setSessionTimeout( aSessionTimeout );
 				}
+				System.out.println("defaultConfig.getSessionTimeout = " + defaultConfig.getSessionTimeout());
 				sessionManager = new ViewingSessionManager(viewingCache,
 						httpSession.getId( ),
 						defaultConfig
 						);
+				/*//moved this down to create session to create session and feed the own sessionManger improved to have sessions list
 				httpSession.setAttribute(
 						IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
-						sessionManager );
+						sessionManager );*/
+			} else {
+				sessionManager.setNewlyCreated(false);
 			}
 			return sessionManager;
 		}
@@ -90,8 +94,7 @@ public class ViewingSessionUtil
 	 * @return BIRT viewing session
 	 * @throws IllegalStateException if the session expired 
 	 */
-	public static IViewingSession getSession( HttpServletRequest request )
-	{
+	public static IViewingSession getSession( HttpServletRequest request ) throws ViewerException {
 		IViewingSession session = (IViewingSession)request.getAttribute( ParameterAccessor.ATTR_VIEWING_SESSION );
 		if ( session == null )
 		{
@@ -124,13 +127,15 @@ public class ViewingSessionUtil
 	public static IViewingSession createSession( HttpServletRequest request )
 			throws ViewerException
 	{
-		IViewingSessionManager manager = getSessionManager( request, true );
-		IViewingSession session = manager.createSession();
-		//for redis serialization no harm for normal session also
-		if(request.getSession() != null) {
+		System.out.println("in createsession");
+		IViewingSessionManager sessionManager = getSessionManager( request, true );
+		IViewingSession session = sessionManager.createSession();
+		System.out.println("spring profiles = " + System.getenv("spring.profiles.active"));
+		//moved this up to create session and feed the own sessionManger improved to have sessions list
+		if(sessionManager.isNewlyCreated() || "sessionha".equalsIgnoreCase(System.getenv("spring.profiles.active"))) {
 			request.getSession().setAttribute(
 					IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
-					manager);
+					sessionManager);
 		}
 			// save the object in a request attribute
 		request.setAttribute( ParameterAccessor.ATTR_VIEWING_SESSION,
@@ -148,6 +153,7 @@ public class ViewingSessionUtil
 	 */
 	public static String getSessionId( HttpServletRequest request )
 	{
+		System.out.println("retrieving based on birt sessionid");
 		String sessionId = request
 				.getParameter( ParameterAccessor.PARAM_VIEWING_SESSION_ID );
 		if ( sessionId == null )

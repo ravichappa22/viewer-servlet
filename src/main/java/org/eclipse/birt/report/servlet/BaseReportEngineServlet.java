@@ -137,7 +137,7 @@ abstract public class BaseReportEngineServlet extends AxisServlet
 
 		try
 		{
-
+			System.out.println("BaseReportEngineServlet calling" + request.getSession().getId());
 			// refresh the current BIRT viewing session by accessing it
 			String requestType = request.getHeader( ParameterAccessor.HEADER_REQUEST_TYPE );
 			boolean isSoapRequest = ParameterAccessor.HEADER_REQUEST_TYPE_SOAP

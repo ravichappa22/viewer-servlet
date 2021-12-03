@@ -49,4 +49,7 @@ public interface IViewingSessionManager
 	 */
 	public abstract void invalidate();
 
+	public abstract boolean isNewlyCreated();
+	public abstract void setNewlyCreated(boolean newlyCreated);
+
 }
