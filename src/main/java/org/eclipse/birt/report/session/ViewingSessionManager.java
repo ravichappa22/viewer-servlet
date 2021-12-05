@@ -49,6 +49,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	
 	private ViewingCache viewingCache;
 	private long nextCleanupTime;
+	private boolean newlyCreated;
 
 	/**
 	 * Linked hash map containing the ViewingSession objects in access order.
@@ -73,6 +74,14 @@ public class ViewingSessionManager implements IViewingSessionManager,
 	private int sessionCountThreshold;
 
 	private ViewingSessionConfig config;
+
+	public boolean isNewlyCreated() {
+		return newlyCreated;
+	}
+
+	public void setNewlyCreated(boolean newlyCreated) {
+		this.newlyCreated = newlyCreated;
+	}
 
 	/**
 	 * Wrapper for the IViewingSession interface, to hook the interface's
@@ -181,6 +190,7 @@ public class ViewingSessionManager implements IViewingSessionManager,
 		this.expired = false;
 		this.nextCleanupTime = new Date( ).getTime( )
 				+ config.getSessionTimeout( ) * 1000l;
+		this.newlyCreated = true;
 	}
 
 	/**

@@ -66,9 +66,9 @@ public class ViewingSessionUtil
 						httpSession.getId( ),
 						defaultConfig
 						);
-				httpSession.setAttribute(
-						IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
-						sessionManager );
+				//moved this down the sesion set to create session and feed the own sessionManger improved to have sessions list
+			} else {
+				sessionManager.setNewlyCreated(false);
 			}
 			return sessionManager;
 		}
@@ -122,12 +122,14 @@ public class ViewingSessionUtil
 	public static IViewingSession createSession( HttpServletRequest request )
 			throws ViewerException
 	{
-		IViewingSessionManager manager = getSessionManager( request, true );
-		IViewingSession session = manager.createSession();
+		IViewingSessionManager sessionManager = getSessionManager( request, true );
+		IViewingSession session = sessionManager.createSession();
 		//for redis serialization no harm for normal session also
-		request.getSession().setAttribute(
-				IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
-				manager);
+		if(sessionManager.isNewlyCreated() || "sessionha".equalsIgnoreCase(System.getenv("spring.profiles.active"))) {
+			request.getSession().setAttribute(
+					IBirtConstants.ATTRIBUTE_VIEWING_SESSION_MANAGER,
+					sessionManager);
+		}
 			// save the object in a request attribute
 		request.setAttribute( ParameterAccessor.ATTR_VIEWING_SESSION,
 						session );
